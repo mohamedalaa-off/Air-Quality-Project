@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load the clean data from Phase 2
-df_clean = pd.read_csv('data_clean.csv', index_col='datetime', parse_dates=True)
+df_clean = pd.read_csv('outputs/data_clean.csv', index_col='datetime', parse_dates=True)
 
 print(f"Loaded clean data: {df_clean.shape}")
 
@@ -183,10 +183,10 @@ axes[1,1].set_ylabel('Standard Deviation')
 axes[1,1].tick_params(axis='x', rotation=30)
 
 plt.tight_layout()
-plt.savefig('feature_engineering.png', dpi=150, bbox_inches='tight')
+plt.savefig('outputs/charts/feature_engineering.png', dpi=150, bbox_inches='tight')
 plt.show()
 print("Saved: feature_engineering.png")
 
 # ── 6. Save the featured data ─────────────────────────────────
-df_feat.to_csv('data_features.csv')
+df_feat.to_csv('outputs/data_features.csv')
 print(f"\nFeatured data saved to: data_features.csv")

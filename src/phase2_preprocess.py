@@ -69,7 +69,7 @@ df_clean = df_clean.interpolate(
 # bfill: copy the next valid value backward
 # This handles edge cases (gaps at the start or end of the dataset)
 
-df_clean = df_clean.fillna(method='ffill').fillna(method='bfill')
+df_clean = df_clean.ffill().bfill()
 
 # Verify no missing values remain
 remaining_missing = df_clean.isnull().sum().sum()
@@ -141,12 +141,12 @@ axes[1].set_title('PM2.5 — AFTER Cleaning')
 axes[1].set_ylabel('PM2.5 (μg/m³)')
 
 plt.tight_layout()
-plt.savefig('cleaning_comparison.png', dpi=150, bbox_inches='tight')
+plt.savefig('outputs/charts/cleaning_comparison.png', dpi=150, bbox_inches='tight')
 plt.show()
 print("Saved: cleaning_comparison.png")
 
 # ── 7. Save the clean data ────────────────────────────────────
-df_clean.to_csv('data_clean.csv')
+df_clean.to_csv('outputs/data_clean.csv')
 print(f"\nClean data saved to: data_clean.csv")
 print(f"Final shape: {df_clean.shape}")
 print(f"Missing values: {df_clean.isnull().sum().sum()}")
