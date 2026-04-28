@@ -181,7 +181,7 @@ axes[1, 1].set_xticks(range(1, 13))
 axes[1, 1].set_xticklabels(month_names, rotation=45)
 
 plt.tight_layout()
-plt.savefig('eda_overview.png', dpi=150, bbox_inches='tight')
+plt.savefig('outputs/charts/eda_overview.png', dpi=150, bbox_inches='tight')
 plt.show()
 print("Saved: eda_overview.png")
 
@@ -209,7 +209,7 @@ sns.heatmap(
 )
 plt.title(f'Correlation Matrix — {STATION}', fontsize=13)
 plt.tight_layout()
-plt.savefig('eda_correlation.png', dpi=150, bbox_inches='tight')
+plt.savefig('outputs/charts/eda_correlation.png', dpi=150, bbox_inches='tight')
 plt.show()
 print("Saved: eda_correlation.png")
 
