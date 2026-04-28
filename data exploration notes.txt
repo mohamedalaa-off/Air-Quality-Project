@@ -1,0 +1,39 @@
+Dtype: Are columns that should be numbers stored as object (text)? That's a problem. 
+> No
+
+Non-null count: If a column has fewer non-null rows than the total, it has missing values.
+- Total Rows ( 420768 ) , Total Feature ( 18 )
+Missing Values :- 
+> PM2.5 ( 8689 ) [ 420768 - 412079 ]
+> PM10  ( 6449 ) [ 420768 - 414319 ]
+> SO2   ( 9021 ) [ 420768 - 411747 ]
+> NO2   ( 12116 ) [ 420768 - 408652 ]
+> CO    ( 20701 ) [ 420768 - 400067 ]
+> O3    ( 13277 ) [ 420768 - 407491 ]
+> TEMP  ( 398 ) [ 420768 - 420370 ]
+> PRES  ( 393 ) [ 420768 - 420375 ]
+> DEWP  ( 403 ) [ 420768 - 420365 ]
+> RAIN  ( 390 ) [ 420768 - 420378 ]
+> wd    ( 1822 ) [ 420768 - 418946 ]
+> WSPM  ( 318 ) [ 420768 - 420450 ]
+
+min values: Is PM2.5 ever negative? It shouldn't be — that's an error.
+> 2 ( No )
+
+max values: Is there a PM2.5 of 999? Probably a sensor error
+> 999 ( Yes )
+
+mean vs 50% (median): If they're very different, the data is skewed.
+79 vs 55
+
+
+Question 1: After running the hourly pattern plot, what hours of day tend to have the highest PM2.5? Why do you think that is?
+0 , 1 , 2 , 21 , 22 , 23 - Temperature Inversion & Lower WSPM & Humidity
+
+Question 2: After running the correlation heatmap, which variable has the strongest positive correlation with PM2.5? Which has the strongest negative correlation?
+Pos : PM , SO2 , NO2 , CO
+Neg : WSPM , O3 , TEMP
+
+Question 3: Does the time series plot show any obvious seasonal pattern? What season is worst?
+Nov to Feb ( Worest )
+
