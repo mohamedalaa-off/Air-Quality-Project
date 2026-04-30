@@ -31,10 +31,10 @@ class AirQualityLSTM(nn.Module):
         # Fully connected output head
         # Maps LSTM output → 24 predictions
         self.fc = nn.Sequential(
-            nn.Linear(hidden_size, 64),  # compress 128 → 64
+            nn.Linear(hidden_size, hidden_size // 2),  # compress 128 → 64
             nn.ReLU(),                    # activation: zero-out negatives
             nn.Dropout(dropout),          # regularize again
-            nn.Linear(64, output_size)   # 64 → 24 predictions
+            nn.Linear(hidden_size // 2, output_size)   # 64 → 24 predictions
         )
 
     def forward(self, x):
