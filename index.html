@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirQ AI | Smart Forecasting</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- PapaParse for easy CSV reading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #4e54c8;
+            --secondary: #8f94fb;
+            --dark: #2c3e50;
+            --light: #f4f7f6;
+            --good: #00b894;
+            --moderate: #fdcb6e;
+            --unhealthy: #d63031;
+            --hazardous: #6c5ce7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            /* Animated Gradient Background */
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            color: var(--dark);
+            padding: 2rem;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+
+        /* Input Controls */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .btn-custom {
+            display: inline-block;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-live {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(78, 84, 200, 0.4);
+        }
+
+        .btn-live:hover {
+            box-shadow: 0 6px 20px rgba(78, 84, 200, 0.6);
+            transform: scale(1.02);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary);
+            background: rgba(78, 84, 200, 0.05);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            background: rgba(78, 84, 200, 0.1);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Dashboard Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .metric-box {
+            text-align: center;
+        }
+
+        .metric-title {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            color: white;
+            font-size: 1.5rem;
+            margin: 2rem 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        #resultsArea { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1><i class="fa-solid fa-wind"></i> AirQ Intelligence Dashboard</h1>
+
+    <!-- Input Section -->
+    <div class="glass-card controls-grid">
+        <div>
+            <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-server"></i> Auto-Fetch Data</h3>
+            <p style="color: #666; margin-bottom: 1rem;">Pull the latest 72 hours of environmental data directly from the live server.</p>
+            <button class="btn-custom btn-live" onclick="fetchLiveForecast()">
+                Generate Live Forecast <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        <div>
+            <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-file-csv"></i> Manual Upload</h3>
+            <p style="color: #666; margin-bottom: 1rem;">Upload your own CSV file containing 72 hours of sensor readings.</p>
+            <label class="upload-area" for="csvFile">
+                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2rem; color: var(--primary);"></i>
+                <br>
+                <strong>Click to browse</strong> or drag CSV here
+            </label>
+            <input type="file" id="csvFile" accept=".csv" onchange="handleFileUpload(event)">
+        </div>
+    </div>
+
+    <!-- Loading Animation -->
+    <div class="loader" id="loader">
+        <i class="fa-solid fa-circle-notch fa-spin"></i> AI is analyzing the atmosphere...
+    </div>
+
+    <!-- Results Section -->
+    <div id="resultsArea">
+        
+        <!-- Summary Metrics -->
+        <div class="metrics-grid">
+            <div class="glass-card metric-box border-left-primary">
+                <div class="metric-title"><i class="fa-solid fa-gauge-high"></i> Average PM2.5</div>
+                <div class="metric-value" id="avgPm25">-</div>
+            </div>
+            <div class="glass-card metric-box">
+                <div class="metric-title"><i class="fa-solid fa-triangle-exclamation"></i> Peak PM2.5</div>
+                <div class="metric-value" id="maxPm25">-</div>
+                <div id="worstHour" style="color: var(--unhealthy); font-weight: 600;">-</div>
+            </div>
+            <div class="glass-card metric-box">
+                <div class="metric-title"><i class="fa-solid fa-shield-virus"></i> Worst Category</div>
+                <div class="metric-value" id="worstCategory" style="font-size: 1.6rem;">-</div>
+            </div>
+            <div class="glass-card metric-box">
+                <div class="metric-title"><i class="fa-solid fa-mask-face"></i> Mask Requirement</div>
+                <div class="metric-value" id="maskReq">-</div>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="glass-card">
+            <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-chart-line"></i> 24-Hour Forecast Trend</h3>
+            <canvas id="forecastChart" height="80"></canvas>
+        </div>
+
+        <!-- Table Section -->
+        <div class="glass-card">
+            <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-list-check"></i> Hourly Breakdown & Advice</h3>
+            <div class="table-container">
+                <table id="forecastTable">
+                    <thead>
+                        <tr>
+                            <th>Hour</th>
+                            <th>PM2.5 (μg/m³)</th>
+                            <th>Fuzzy Risk</th>
+                            <th>Category</th>
+                            <th>Actionable Advice</th>
+                        </tr>
+                    </thead>
+                    <tbody id="forecastTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let myChart = null;
+
+    // Helper to get color based on category
+    function getCategoryColor(category) {
+        if(category.includes('Good')) return 'var(--good)';
+        if(category.includes('Moderate')) return 'var(--moderate)';
+        if(category.includes('Unhealthy')) return 'var(--unhealthy)';
+        return 'var(--hazardous)';
+    }
+
+    // 1. Fetch from Server (Easy Button)
+    async function fetchLiveForecast() {
+        showLoader();
+        try {
+            const response = await fetch('http://127.0.0.1:8000/forecast-latest');
+            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+            const data = await response.json();
+            updateUI(data);
+        } catch (error) {
+            alert('Failed to connect to API. Is FastAPI running?');
+            hideLoader();
+        }
+    }
+
+    // 2. Manual File Upload (Easy Input)
+    function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        showLoader();
+        
+        // Parse CSV using PapaParse
+        Papa.parse(file, {
+            skipEmptyLines: true,
+            complete: async function(results) {
+                try {
+                    // Remove header row if it exists (assuming numbers below it)
+                    let rows = results.data;
+                    if (isNaN(rows[0][0])) rows.shift(); 
+                    
+                    // Convert strings to floats
+                    let parsedData = rows.map(row => row.map(val => parseFloat(val)));
+                    
+                    // We need exactly 72 rows (take the last 72 if longer)
+                    if (parsedData.length > 72) {
+                        parsedData = parsedData.slice(-72);
+                    } else if (parsedData.length < 72) {
+                        alert("Error: File must contain at least 72 rows of data!");
+                        hideLoader();
+                        return;
+                    }
+
+                    // Send parsed data to the main /forecast API
+                    const response = await fetch('http://127.0.0.1:8000/forecast', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ sensor_readings: parsedData })
+                    });
+
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    const data = await response.json();
+                    updateUI(data);
+
+                } catch (err) {
+                    alert('Failed to process file. Make sure columns match the model features.');
+                    console.error(err);
+                    hideLoader();
+                }
+            }
+        });
+    }
+
+    // Update the beautiful UI
+    function updateUI(data) {
+        document.getElementById('resultsArea').style.display = 'block';
+        hideLoader();
+
+        // 1. Metrics
+        document.getElementById('avgPm25').innerText = `${data.summary.avg_pm25}`;
+        document.getElementById('maxPm25').innerText = `${data.summary.max_pm25}`;
+        document.getElementById('worstHour').innerText = `Peaks at Hour +${data.summary.worst_hour}`;
+        
+        let wCat = document.getElementById('worstCategory');
+        wCat.innerText = data.summary.worst_category;
+        wCat.style.color = getCategoryColor(data.summary.worst_category);
+        
+        const mask = data.summary.mask_recommended;
+        document.getElementById('maskReq').innerHTML = mask ? '<i class="fa-solid fa-mask-face text-danger"></i> YES' : '<i class="fa-regular fa-face-smile text-success"></i> NO';
+
+        // 2. Table
+        const tbody = document.getElementById('forecastTableBody');
+        tbody.innerHTML = ''; 
+        
+        let labels = [];
+        let chartData = [];
+        let colors = [];
+
+        data.hourly_forecast.forEach(hour => {
+            const tr = document.createElement('tr');
+            const color = getCategoryColor(hour.category);
+            
+            // Collect data for Chart
+            labels.push(`+${hour.forecast_hour}h`);
+            chartData.push(hour.pm25);
+            colors.push(color);
+
+            tr.innerHTML = `
+                <td><strong>+${hour.forecast_hour}h</strong></td>
+                <td><strong>${hour.pm25.toFixed(1)}</strong></td>
+                <td>${hour.risk_score.toFixed(1)} / 100</td>
+                <td><span class="badge" style="background-color: ${color}">${hour.category}</span></td>
+                <td style="font-size: 0.9rem;">${hour.advice}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // 3. Chart.js Drawing
+        drawChart(labels, chartData, colors);
+    }
+
+    function drawChart(labels, data, colors) {
+        const ctx = document.getElementById('forecastChart').getContext('2d');
+        if (myChart) myChart.destroy(); // Destroy old chart if exists
+
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Predicted PM2.5 Level',
+                    data: data,
+                    borderColor: 'rgba(78, 84, 200, 1)',
+                    backgroundColor: 'rgba(78, 84, 200, 0.2)',
+                    borderWidth: 3,
+                    pointBackgroundColor: colors,
+                    pointRadius: 6,
+                    fill: true,
+                    tension: 0.4 // Makes the line curvy!
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    function showLoader() {
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('resultsArea').style.display = 'none';
+    }
+
+    function hideLoader() {
+        document.getElementById('loader').style.display = 'none';
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+["PM2.5", "PM10", "SO2", "NO2", "CO", "O3", "TEMP", "PRES", "DEWP", "RAIN", "WSPM", "hour", "day_of_week", "month", "is_weekend", "hour_sin", "hour_cos", "month_sin", "month_cos", "dow_sin", "dow_cos", "PM25_roll_24h", "PM25_roll_std_6h"]
