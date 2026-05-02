@@ -71,6 +71,5 @@ python -m uvicorn app:app --reload
 ### 4. Launch the Dashboard
 Simply open index.html in any modern web browser.
 
-Click "Generate Live Forecast" to test with server data.
-
-Or Upload a CSV containing 72 rows of sensor data to see custom predictions.
+* Click "Generate Live Forecast" to test with server data.
+* Or Upload a CSV containing 72 rows of sensor data to see custom predictions.
