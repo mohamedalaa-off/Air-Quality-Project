@@ -91,8 +91,5 @@ Simply open `index.html` in any modern web browser.
 └── outputs/                  # Cleaned datasets and evaluation charts
 ```
 
-## 👨‍💻 Author
-**Osama Hamdi (Osama El-Gantery)**
-- Full-Stack .NET Web Developer & AI Enthusiast.
 - Project Repository: [mohamedalaa-off/Air-Quality-Project](https://github.com/mohamedalaa-off/Air-Quality-Project)
 ```
