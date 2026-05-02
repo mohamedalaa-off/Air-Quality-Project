@@ -68,8 +68,31 @@ pip install -r requirements.txt
 ```bash
 python -m uvicorn app:app --reload
 ```
-### 4. Launch the Dashboard
-Simply open index.html in any modern web browser.
+*The API will be live at `http://127.0.0.1:8000`. You can test endpoints interactively at `http://127.0.0.1:8000/docs`.*
 
-* Click "Generate Live Forecast" to test with server data.
-* Or Upload a CSV containing 72 rows of sensor data to see custom predictions.
+### 4. Launch the Dashboard
+Simply open `index.html` in any modern web browser.
+- Click **"Generate Live Forecast"** to test with server data.
+- Or **Upload a CSV** containing 72 rows of sensor data to see custom predictions.
+
+---
+
+## 📂 Repository Structure
+```text
+├── src/
+│   ├── phase1_clean.py       # Handles missing values and outliers
+│   ├── phase3_features.py    # Time-encoding and rolling features
+│   ├── phase4_model.py       # LSTM architecture and training loop
+│   ├── phase5_evaluate.py    # Recursive testing and custom metrics
+│   └── phase6_fuzzy.py       # Fuzzy logic inference rules
+├── app.py                    # FastAPI server (Deployment)
+├── index.html                # Interactive Frontend Dashboard
+├── saved_models/             # Scalers, feature configs, and .pth weights
+└── outputs/                  # Cleaned datasets and evaluation charts
+```
+
+## 👨‍💻 Author
+**Osama Hamdi (Osama El-Gantery)**
+- Full-Stack .NET Web Developer & AI Enthusiast.
+- Project Repository: [mohamedalaa-off/Air-Quality-Project](https://github.com/mohamedalaa-off/Air-Quality-Project)
+```
