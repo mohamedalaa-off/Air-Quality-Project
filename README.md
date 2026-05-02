@@ -57,5 +57,20 @@ A rules-based inference system (`skfuzzy`) acts as the bridge between AI and hum
 ```bash
 git clone [https://github.com/mohamedalaa-off/Air-Quality-Project.git](https://github.com/mohamedalaa-off/Air-Quality-Project.git)
 cd Air-Quality-Project
+```
 
-## 2. Install Dependencies
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Start the FastAPI Server
+```bash
+python -m uvicorn app:app --reload
+```
+### 4. Launch the Dashboard
+Simply open index.html in any modern web browser.
+
+Click "Generate Live Forecast" to test with server data.
+
+Or Upload a CSV containing 72 rows of sensor data to see custom predictions.
